@@ -1,0 +1,25 @@
+.chart-container {
+  width: 80%;
+  margin: 0 auto;
+}
+
+table {
+  margin: 20px auto;
+  width: 95%;
+}
+
+button {
+  margin: 5px;
+}
+
+.modal-dialog {
+  max-width: 800px;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
