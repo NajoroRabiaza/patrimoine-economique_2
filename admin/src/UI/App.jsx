@@ -170,7 +170,6 @@ function App() {
         <Routes>
           <Route path="/patrimoine" element={
             <div>
-              <h1>Graphique du Patrimoine :</h1>
               <div className="chart-container">
                 <Line data={chartData} options={chartOptions} />
                 <label>
@@ -181,7 +180,6 @@ function App() {
           } />
           <Route path="/possession" element={
             <div>
-              <h1>Liste de Patrimoine :</h1>
               <Button variant="success" onClick={() => setShowAddModal(true)}>
                 Ajouter une nouvelle possession
               </Button>
