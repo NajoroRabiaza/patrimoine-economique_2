@@ -5,8 +5,8 @@ import './ListPossession.css';
 
 const ListPossession = () => {
   return (
-    <div>
-      <Button variant="success" as={Link} to="/possession/create">
+    <div className="list-possession-container">
+      <Button variant="success" as={Link} to="/possession/create" className="add-possession-button">
         Ajouter une nouvelle possession
       </Button>
     </div>

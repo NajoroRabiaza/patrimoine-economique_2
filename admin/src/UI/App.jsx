@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect } from 'react';
 import data from '../data/data.json';
 import Possession from "../models/possessions/Possession";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -44,26 +44,18 @@ function App() {
     tauxAmortissement: ''
   });
 
-  const handleAddModalChange = (event) => {
-    const { name, value } = event.target;
-    setNewPossession(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleAddModalChange = ({ target: { name, value } }) => {
+    setNewPossession(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddSave = async () => {
     try {
       const valeur = parseFloat(newPossession.valeur);
-      if (isNaN(valeur)) {
-        throw new Error('La valeur doit être un nombre');
-      }
+      if (isNaN(valeur)) throw new Error('La valeur doit être un nombre');
 
       const response = await fetch('http://localhost:3000/possession', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           possesseur: { nom: 'John Doe' },
           ...newPossession,
@@ -73,9 +65,7 @@ function App() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
 
       const addedPossession = await response.json();
       setInfo(prevInfo => [...prevInfo, addedPossession]);
@@ -86,58 +76,45 @@ function App() {
   };
 
   useEffect(() => {
-    const possessions = transformDataToPossessions(data);
-    setInfo(possessions);
+    setInfo(transformDataToPossessions(data));
   }, []);
 
-  const handleDateActuelleChange = (event) => {
-    setDateActuelle(event.target.value);
+  const handleDateActuelleChange = ({ target: { value } }) => {
+    setDateActuelle(value);
   };
 
   const currentDate = new Date(dateActuelle);
 
-  const calculerSommeTotale = () => {
-    return info.reduce((total, poss) => total + poss.getValeur(currentDate), 0);
-  };
+  const calculerSommeTotale = () => info.reduce((total, poss) => total + poss.getValeur(currentDate), 0);
 
   const chartData = {
     labels: info.map(pos => pos.libelle),
-    datasets: [
-      {
-        label: 'Valeur à la date T',
-        data: info.map(pos => pos.getValeur(currentDate)),
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        fill: true,
-      }
-    ]
+    datasets: [{
+      label: 'Valeur à la date T',
+      data: info.map(pos => pos.getValeur(currentDate)),
+      borderColor: 'rgba(75, 192, 192, 1)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      fill: true,
+    }]
   };
 
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: 'top',
-      },
+      legend: { position: 'top' },
       tooltip: {
         callbacks: {
-          label: function (tooltipItem) {
-            return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} Ar`;
-          }
+          label: ({ label, raw }) => `${label}: ${raw.toFixed(2)} Ar`
         }
       }
     },
     elements: {
-      line: {
-        borderWidth: 2,
-      },
-      point: {
-        radius: 3,
-      }
-    },
+      line: { borderWidth: 2 },
+      point: { radius: 3 }
+    }
   };
 
-  const handleEdit = (possession) => {
+  const handleEdit = possession => {
     setEditingPossession(possession);
     setShowModal(true);
   };
@@ -149,9 +126,7 @@ function App() {
         method: 'PATCH'
       });
 
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
 
       const updatedPossession = await response.json();
       const updatedInfo = info.map((p, i) => (i === index ? { ...p, dateFin: updatedPossession } : p));
@@ -165,9 +140,7 @@ function App() {
     try {
       const response = await fetch(`http://localhost:3000/possession/${encodeURIComponent(editingPossession.libelle)}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dateFin: editingPossession.dateFin,
           valeur: editingPossession.valeur,
@@ -175,9 +148,7 @@ function App() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
 
       const updatedPossession = await response.json();
       const updatedInfo = info.map(poss => (poss.libelle === editingPossession.libelle ? updatedPossession : poss));
@@ -188,12 +159,8 @@ function App() {
     }
   };
 
-  const handleModalChange = (event) => {
-    const { name, value } = event.target;
-    setEditingPossession(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleModalChange = ({ target: { name, value } }) => {
+    setEditingPossession(prev => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -207,11 +174,7 @@ function App() {
               <div className="chart-container">
                 <Line data={chartData} options={chartOptions} />
                 <label>
-                  <input
-                    type="date"
-                    value={dateActuelle}
-                    onChange={handleDateActuelleChange}
-                  />
+                  <input type="date" value={dateActuelle} onChange={handleDateActuelleChange} />
                 </label>
               </div>
             </div>
@@ -233,11 +196,7 @@ function App() {
                     <th>
                       Valeur à la date T:
                       <label>
-                        <input
-                          type="date"
-                          value={dateActuelle}
-                          onChange={handleDateActuelleChange}
-                        />
+                        <input type="date" value={dateActuelle} onChange={handleDateActuelleChange} />
                       </label>
                     </th>
                     <th>Actions</th>
@@ -318,12 +277,8 @@ function App() {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Annuler
-            </Button>
-            <Button variant="primary" onClick={handleSave}>
-              Sauvegarder
-            </Button>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>Annuler</Button>
+            <Button variant="primary" onClick={handleSave}>Sauvegarder</Button>
           </Modal.Footer>
         </Modal>
 
@@ -391,12 +346,8 @@ function App() {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowAddModal(false)}>
-              Annuler
-            </Button>
-            <Button variant="primary" onClick={handleAddSave}>
-              Ajouter
-            </Button>
+            <Button variant="secondary" onClick={() => setShowAddModal(false)}>Annuler</Button>
+            <Button variant="primary" onClick={handleAddSave}>Ajouter</Button>
           </Modal.Footer>
         </Modal>
       </div>

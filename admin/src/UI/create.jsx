@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import './CreatePossessionPage.css'; // 
+import './CreatePossessionPage.css';
 
 const CreatePossessionPage = () => {
   const [newPossession, setNewPossession] = useState({
@@ -12,37 +12,33 @@ const CreatePossessionPage = () => {
     dateFin: '',
     tauxAmortissement: ''
   });
-
+  
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setNewPossession(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleChange = ({ target: { name, value } }) => {
+    setNewPossession(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
-    try {
-      const valeur = parseFloat(newPossession.valeur);
-      if (isNaN(valeur)) {
-        setError('La valeur doit être un nombre');
-        return;
-      }
+    const { valeur, dateDebut, dateFin, ...rest } = newPossession;
+    const valeurNumber = parseFloat(valeur);
 
+    if (isNaN(valeurNumber)) {
+      setError('La valeur doit être un nombre');
+      return;
+    }
+
+    try {
       const response = await fetch('http://localhost:6000/possession', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           possesseur: { nom: 'John Doe' },
-          ...newPossession,
-          valeur,
-          dateDebut: new Date(newPossession.dateDebut).toISOString(),
-          dateFin: newPossession.dateFin ? new Date(newPossession.dateFin).toISOString() : null
+          ...rest,
+          valeur: valeurNumber,
+          dateDebut: new Date(dateDebut).toISOString(),
+          dateFin: dateFin ? new Date(dateFin).toISOString() : null
         })
       });
 
